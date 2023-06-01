@@ -1,6 +1,9 @@
+import time
+
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
+
+from selenium.webdriver.common.keys import Keys
 
 service = Service('D:\chromedriver.exe')
 
@@ -15,15 +18,20 @@ def get_driver():
     options.add_argument("disable-blink-features=AutomationControlled")
 
     browser = webdriver.Chrome(service=service, options=options)
-    browser.get("https://www.pythonanywhere.com/")
+    browser.get("https://automated.pythonanywhere.com/login/")
     return browser
 
 
 def main():
     driver = get_driver()
-    element = driver.find_elements(By.TAG_NAME, "h1")
-    for ele in element:
-        print(ele.text)
+    time.sleep(1)
+    driver.find_element(by="id", value="id_username").send_keys("automated")
+    time.sleep(1)
+    driver.find_element(by="id", value="id_password").send_keys("automatedautomated" + Keys.ENTER)
+    time.sleep(1)
+    print(driver.current_url)
+    driver.find_element(by="xpath", value="/html/body/nav/div/a").click()
+    print(driver.current_url)
+    time.sleep(4)
 
-
-main()
+print(main())
