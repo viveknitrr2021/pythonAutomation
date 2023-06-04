@@ -1,37 +1,19 @@
-import time
+from flask import Flask, jsonify
+import ScrapeCurrency
 
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-
-from selenium.webdriver.common.keys import Keys
-
-service = Service('D:\chromedriver.exe')
+app = Flask(__name__)
 
 
-def get_driver():
-    options = webdriver.ChromeOptions()
-    options.add_argument("disable-infobars")
-    options.add_argument("start-maximized")
-    options.add_argument("disable-dev-shm-usage")
-    options.add_argument("no-sandbox")
-    options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    options.add_argument("disable-blink-features=AutomationControlled")
-
-    browser = webdriver.Chrome(service=service, options=options)
-    browser.get("https://automated.pythonanywhere.com/login/")
-    return browser
+@app.route('/')
+def home():
+    return '<h1>Currency Rate API</h1> <p> Example URL: /api/v1/use-eur</p>'
 
 
-def main():
-    driver = get_driver()
-    time.sleep(1)
-    driver.find_element(by="id", value="id_username").send_keys("automated")
-    time.sleep(1)
-    driver.find_element(by="id", value="id_password").send_keys("automatedautomated" + Keys.ENTER)
-    time.sleep(1)
-    print(driver.current_url)
-    driver.find_element(by="xpath", value="/html/body/nav/div/a").click()
-    print(driver.current_url)
-    time.sleep(4)
+@app.route('/api/v1/<in_cur>-<out_cur>')
+def api(in_cur, out_cur):
+    rate = ScrapeCurrency.get_currency(in_cur, out_cur)
+    res_dict = {'input_currency': in_cur, 'output_currency': out_cur, 'rate': rate}
+    return jsonify(res_dict)
 
-print(main())
+
+app.run()
